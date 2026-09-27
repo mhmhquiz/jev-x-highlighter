@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Jev X Highlighter</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="popup">
+  <label class="row"><input type="checkbox" id="enabled"> 強調表示を有効にする</label>
+
+  <label class="field">
+    <span>対象外のツイート</span>
+    <select id="displayMode">
+      <option value="none">そのまま</option>
+      <option value="dim">薄く表示</option>
+      <option value="collapse">折りたたみ</option>
+      <option value="hide">非表示</option>
+    </select>
+  </label>
+
+  <fieldset>
+    <legend>カテゴリ</legend>
+    <div id="categories"></div>
+  </fieldset>
+
+  <p id="usage" class="muted"></p>
+  <p id="error" class="error" hidden></p>
+  <button id="openOptions">詳細設定</button>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

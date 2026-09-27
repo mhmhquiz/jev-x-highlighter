@@ -1,0 +1,55 @@
+article.jev-hit {
+  position: relative;
+  box-shadow: inset 4px 0 0 var(--jev-color);
+  background-color: color-mix(in srgb, var(--jev-color) 10%, transparent) !important;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+article.jev-hit.jev-weak {
+  box-shadow: inset 2px 0 0 var(--jev-color);
+  background-color: transparent !important;
+}
+
+.jev-badge {
+  position: absolute;
+  top: 6px;
+  right: 64px;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  font: 600 11px/18px system-ui, sans-serif;
+  pointer-events: auto;
+}
+
+.jev-badge span {
+  padding: 0 7px;
+  border-radius: 9px;
+  color: #fff;
+  background: var(--c);
+}
+
+.jev-badge span.weak {
+  color: var(--c);
+  background: transparent;
+  border: 1px solid var(--c);
+}
+
+html[data-jev-mode='dim'] article.jev-miss {
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+
+html[data-jev-mode='dim'] article.jev-miss:hover {
+  opacity: 1;
+}
+
+html[data-jev-mode='collapse'] article.jev-miss:not(.jev-expanded) {
+  max-height: 52px;
+  overflow: hidden;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+html[data-jev-mode='hide'] .jev-cell-miss {
+  display: none !important;
+}
