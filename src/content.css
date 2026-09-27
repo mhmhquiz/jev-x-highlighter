@@ -1,0 +1,146 @@
+/* ---- 強調 ----------------------------------------------------------------
+ * ツイートの並びや大きさは変えず、左の細い帯と背景色だけを付ける。
+ * 背景の濃さ (--jev-strength, %) は確率に合わせて content.js が決める。 */
+article.jev-hit {
+  position: relative;
+  background-color: color-mix(in srgb, var(--jev-color) calc(var(--jev-strength, 10) * 1%), transparent) !important;
+  transition: background-color 0.2s;
+}
+
+/* 左の帯。複数カテゴリなら縞になる。 */
+article.jev-hit::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--jev-bar, var(--jev-color));
+  pointer-events: none;
+  z-index: 1;
+}
+
+article.jev-hit.jev-weak::before {
+  width: 2px;
+  opacity: 0.7;
+}
+
+/* ---- タグ (ツイート右上の隙間) ------------------------------------------ */
+.jev-badge {
+  position: absolute;
+  top: 8px;
+  right: 64px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 55%;
+  font: 600 11px/18px system-ui, -apple-system, 'Segoe UI', sans-serif;
+  pointer-events: auto;
+}
+
+.jev-chip {
+  padding: 0 7px;
+  border-radius: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  color: var(--fg, #fff);
+  background: var(--c);
+}
+
+.jev-chip.weak {
+  color: var(--c);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--c);
+}
+
+.jev-chip.mute {
+  color: inherit;
+  background: color-mix(in srgb, var(--c) 25%, transparent);
+  opacity: 0.8;
+}
+
+.jev-useful {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* 👍 / 👎: タグにカーソルを当てたときだけ出す (押したものは出したままにする)。 */
+.jev-fb {
+  display: none;
+  gap: 2px;
+}
+
+.jev-badge:hover .jev-fb,
+.jev-fb.voted {
+  display: inline-flex;
+}
+
+.jev-badge:not(:hover) .jev-fb.voted button:not(.on) {
+  display: none;
+}
+
+.jev-fb button {
+  font: 12px/18px system-ui, sans-serif;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 9px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.jev-fb button:hover,
+.jev-fb button.on {
+  opacity: 1;
+}
+
+.jev-fb button.on {
+  background: color-mix(in srgb, var(--jev-color, #1d9bf0) 30%, transparent);
+}
+
+/* ---- 対象外 / ミュートの表示モード ------------------------------------- */
+article.jev-muted {
+  position: relative;
+}
+
+html[data-jev-mode='dim'] article.jev-miss {
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+
+html[data-jev-mode='dim'] article.jev-miss:hover {
+  opacity: 1;
+}
+
+html[data-jev-mode='collapse'] article.jev-miss:not(.jev-expanded) {
+  max-height: 52px;
+  overflow: hidden;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+html[data-jev-mode='hide'] .jev-cell-miss {
+  display: none !important;
+}
+
+html[data-jev-mute='dim'] article.jev-muted {
+  opacity: 0.3;
+  transition: opacity 0.15s;
+}
+
+html[data-jev-mute='dim'] article.jev-muted:hover {
+  opacity: 1;
+}
+
+html[data-jev-mute='collapse'] article.jev-muted:not(.jev-expanded) {
+  max-height: 44px;
+  overflow: hidden;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+html[data-jev-mute='hide'] .jev-cell-muted {
+  display: none !important;
+}

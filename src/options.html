@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Jev X Highlighter 設定</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="options">
+  <h1>Jev X Highlighter 設定</h1>
+
+  <section>
+    <h2>Jev API キー</h2>
+    <p class="muted">TypeSafe のコンソール (console.typesafe.ai) で発行したキーを入力します。このブラウザにだけ保存され、同期されません。</p>
+    <div class="row">
+      <input type="password" id="apiKey" autocomplete="off" placeholder="未設定">
+      <button id="saveKey">保存</button>
+      <button id="clearKey">削除</button>
+      <button id="testKey">接続テスト</button>
+    </div>
+    <p id="keyState" class="muted"></p>
+  </section>
+
+  <section>
+    <h2>判定</h2>
+    <label class="field"><span>強調するしきい値 (0〜1)</span><input type="number" id="threshold" min="0" max="1" step="0.05"></label>
+    <label class="field"><span>弱く強調するしきい値 (0〜1)</span><input type="number" id="weakThreshold" min="0" max="1" step="0.05"></label>
+    <label class="field"><span>1 日の判定上限 (件)</span><input type="number" id="dailyLimit" min="0" step="100"></label>
+    <label class="row"><input type="checkbox" id="usefulness"> 有益さも判定して、情報の多いツイートに 💡 を付ける</label>
+    <label class="row"><input type="checkbox" id="usefulOnly"> 有益さが低いツイートは、しきい値を超えても弱い強調にする</label>
+    <label class="row"><input type="checkbox" id="feedbackButtons"> タグにカーソルを当てたとき 👍 / 👎 ボタンを出す</label>
+  </section>
+
+  <section>
+    <h2>カテゴリ</h2>
+    <p class="muted">「判定の説明」は Jev への質問文です。英語のほうが精度が出やすいとされています。キーワード・アカウントに一致したツイートは Jev の判定を待たずに強調します。種類を「ミュート」にすると、該当したツイートを薄く・折りたたみ・非表示にします (ポップアップで切り替え)。</p>
+    <div id="categories"></div>
+    <button id="addCategory">カテゴリを追加</button>
+  </section>
+
+  <div class="actions sticky">
+    <button id="save" class="primary">保存</button>
+    <button id="reset">初期設定に戻す</button>
+    <span id="saved" class="muted"></span>
+  </div>
+
+  <section>
+    <h2>判定ログ (👍 / 👎)</h2>
+    <p class="muted">X で押した 👍 / 👎 の記録です。カテゴリごとの正解率でしきい値を見直せます。「例に追加」を押すと、そのツイートをカテゴリの「該当する例 / 該当しない例」に追記します (追記後に「保存」を押すと反映されます)。</p>
+    <div id="stats" class="stats"></div>
+    <div class="row">
+      <select id="logFilter">
+        <option value="all">すべて</option>
+        <option value="down">👎 だけ</option>
+        <option value="up">👍 だけ</option>
+      </select>
+      <button id="clearLog">ログを消す</button>
+    </div>
+    <table class="log">
+      <thead><tr><th>評価</th><th>ツイート</th><th>判定</th><th>例に追加</th></tr></thead>
+      <tbody id="log"></tbody>
+    </table>
+    <p id="logEmpty" class="muted" hidden>まだ記録がありません。</p>
+  </section>
+
+  <template id="categoryTemplate">
+    <div class="category">
+      <div class="row">
+        <input type="checkbox" data-k="enabled" title="有効">
+        <input type="color" data-k="color">
+        <input type="text" data-k="name" placeholder="カテゴリ名">
+        <select data-k="kind" title="種類">
+          <option value="highlight">強調</option>
+          <option value="mute">ミュート</option>
+        </select>
+        <button data-action="up" title="上へ">↑</button>
+        <button data-action="down" title="下へ">↓</button>
+        <button data-action="remove">削除</button>
+      </div>
+      <label class="field"><span>しきい値 (0〜1、空欄なら全体の値)</span><input type="number" data-k="threshold" min="0" max="1" step="0.05" placeholder="全体の値"></label>
+      <label class="field"><span>判定の説明 (Jev への質問)</span><textarea data-k="instructions" rows="3"></textarea></label>
+      <label class="field"><span>該当する例 (はい の基準)</span><textarea data-k="criteriaTrue" rows="2"></textarea></label>
+      <label class="field"><span>該当しない例 (いいえ の基準)</span><textarea data-k="criteriaFalse" rows="2"></textarea></label>
+      <label class="field"><span>必ず該当するキーワード (カンマ区切り)</span><input type="text" data-k="keywords"></label>
+      <label class="field"><span>必ず該当するアカウント (@ID、カンマ区切り)</span><input type="text" data-k="accounts"></label>
+      <label class="field"><span>小分類 (1 行に 1 つ、「名前: 説明」。ラベルに「AI · 画像生成」のように出ます)</span><textarea data-k="subtags" rows="4" placeholder="画像生成: AI による画像やイラストの生成"></textarea></label>
+    </div>
+  </template>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
