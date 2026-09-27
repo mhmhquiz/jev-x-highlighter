@@ -93,3 +93,24 @@ test('後から加えた初期カテゴリ (VALORANT、地震) は既存の設�
   const v2 = normalizeSettings({ defaultsVersion: 2, categories: [{ id: 'ai', name: 'AI' }] });
   assert.deepEqual(v2.categories.map((c) => c.id), ['ai', 'quake']);
 });
+
+test('v3 までの AI カテゴリにはキーワードを足し、初期値のままの判定文だけ広げる', () => {
+  const oldAi = {
+    id: 'ai',
+    name: 'AI',
+    instructions:
+      'Is this post mainly about artificial intelligence, such as generative AI, LLMs, AI chatbots (ChatGPT, Claude, Gemini), AI image/video/music generation, AI tools and how to use them, or AI news and research?',
+    criteriaTrue: '自分で書き換えた条件',
+    keywords: ['claude', '自作ワード'],
+  };
+  const s = normalizeSettings({ defaultsVersion: 3, categories: [oldAi] });
+  const ai = s.categories.find((c) => c.id === 'ai');
+  const def = DEFAULT_SETTINGS.categories.find((c) => c.id === 'ai');
+  assert.equal(ai.instructions, def.instructions);
+  assert.equal(ai.criteriaTrue, '自分で書き換えた条件');
+  assert.ok(ai.keywords.includes('ChatGPT') && ai.keywords.includes('自作ワード'));
+  assert.equal(ai.keywords.filter((k) => k.toLowerCase() === 'claude').length, 1);
+  // 移行済みの設定には再度足さない
+  const again = normalizeSettings({ ...s, categories: [{ ...ai, keywords: ['自作ワード'] }] });
+  assert.deepEqual(again.categories[0].keywords, ['自作ワード']);
+});

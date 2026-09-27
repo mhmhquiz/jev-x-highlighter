@@ -1,3 +1,23 @@
+// AI カテゴリの判定文とキーワード。v4 で広げた (Claude や ChatGPT の話題を拾いきれなかったため)。
+const AI_INSTRUCTIONS =
+  'Is this post about artificial intelligence? This includes generative AI, LLMs, AI chatbots and assistants (ChatGPT, Claude, Gemini, Grok, Copilot, DeepSeek, etc.), AI coding tools (Claude Code, Cursor, Codex, etc.), AI image/video/music generation (Midjourney, Stable Diffusion, Sora, etc.), AI companies (OpenAI, Anthropic, Google DeepMind, etc.), using AI or sharing what AI said or made, opinions and complaints about AI, and AI news or research. Short or casual posts about using a specific AI also count.';
+const AI_CRITERIA_TRUE =
+  'AI の技術・製品・サービス (ChatGPT、Claude、Gemini など) ・使い方・感想・ニュース・研究・AI で作った作品のいずれかが話題になっている (短い感想や雑談でも、特定の AI を使った話なら該当)';
+const AI_CRITERIA_FALSE = 'AI と無関係な話題 (例: AIR、愛、人名のアイ、家電の「AI搭載」だけを売り文句にした広告)';
+// 部分一致で強調する。誤判定しやすい短い語 (AI 単体、Sora、Llama など) は入れない。
+const AI_KEYWORDS = [
+  'ChatGPT', 'チャットGPT', 'GPT-4', 'GPT-5', 'OpenAI', 'Claude', 'Anthropic', 'Gemini', 'NotebookLM', 'Grok',
+  'Copilot', 'DeepSeek', 'Perplexity AI', 'Midjourney', 'Stable Diffusion', 'NovelAI', 'Hugging Face', 'LLM',
+  '生成AI', '画像生成AI', '対話AI', 'AIエージェント', 'Cursor AI', 'Codex',
+];
+// v3 までの判定文。書き換えていない設定だけ新しいものに置き換える。
+const OLD_AI_TEXT = {
+  instructions:
+    'Is this post mainly about artificial intelligence, such as generative AI, LLMs, AI chatbots (ChatGPT, Claude, Gemini), AI image/video/music generation, AI tools and how to use them, or AI news and research?',
+  criteriaTrue: 'AI の技術・製品・使い方・ニュース・研究・AI で作った作品が話題の中心になっている',
+  criteriaFalse: 'AI に一言触れているだけ、または無関係 (例: AIR、愛、家電の「AI搭載」広告、人名のアイ)',
+};
+
 // 初期設定。保存された設定が無いときに使う。
 export const DEFAULT_SETTINGS = {
   enabled: true,
@@ -23,11 +43,10 @@ export const DEFAULT_SETTINGS = {
       enabled: true,
       kind: 'highlight', // highlight: 強調 / mute: 薄く・隠す
       threshold: null, // null なら全体のしきい値
-      instructions:
-        'Is this post mainly about artificial intelligence, such as generative AI, LLMs, AI chatbots (ChatGPT, Claude, Gemini), AI image/video/music generation, AI tools and how to use them, or AI news and research?',
-      criteriaTrue: 'AI の技術・製品・使い方・ニュース・研究・AI で作った作品が話題の中心になっている',
-      criteriaFalse: 'AI に一言触れているだけ、または無関係 (例: AIR、愛、家電の「AI搭載」広告、人名のアイ)',
-      keywords: [],
+      instructions: AI_INSTRUCTIONS,
+      criteriaTrue: AI_CRITERIA_TRUE,
+      criteriaFalse: AI_CRITERIA_FALSE,
+      keywords: AI_KEYWORDS,
       accounts: [],
       subtags: [
         { name: '画像・動画生成', description: 'AI による画像・イラスト・動画・音楽の生成' },
@@ -113,8 +132,21 @@ export const DEFAULT_SETTINGS = {
 };
 
 // 後から初期カテゴリに加えたもの。既存の設定にも 1 回だけ足す (消したものは戻さない)。
-export const DEFAULTS_VERSION = 3;
+export const DEFAULTS_VERSION = 4;
 const ADDED_CATEGORIES = { 2: ['valorant'], 3: ['quake'] };
+
+// v4: AI カテゴリにキーワードを足し、初期値のままの判定文を広げる。
+function widenAi(c) {
+  if (c.id !== 'ai') return c;
+  const next = { ...c };
+  const newText = { instructions: AI_INSTRUCTIONS, criteriaTrue: AI_CRITERIA_TRUE, criteriaFalse: AI_CRITERIA_FALSE };
+  for (const [k, oldText] of Object.entries(OLD_AI_TEXT)) {
+    if (c[k] === oldText) next[k] = newText[k];
+  }
+  const have = new Set((c.keywords || []).map((k) => k.toLowerCase()));
+  next.keywords = [...(c.keywords || []), ...AI_KEYWORDS.filter((k) => !have.has(k.toLowerCase()))];
+  return next;
+}
 
 // 古い設定に無い項目を補う。
 export function normalizeSettings(stored) {
@@ -129,6 +161,7 @@ export function normalizeSettings(stored) {
       s.categories = [...s.categories];
       s.categories.splice(at, 0, cat);
     }
+    if (v === 4) s.categories = s.categories.map(widenAi);
   }
   s.defaultsVersion = DEFAULTS_VERSION;
   s.categories = (s.categories || []).map((c) => ({
