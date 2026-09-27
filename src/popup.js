@@ -1,14 +1,14 @@
-import { DEFAULT_SETTINGS } from './defaults.js';
+import { loadSettings, saveSettings } from './defaults.js';
 
 const $ = (id) => document.getElementById(id);
 
 async function load() {
-  const { settings: stored } = await chrome.storage.sync.get('settings');
-  const settings = { ...DEFAULT_SETTINGS, ...(stored || {}) };
+  const settings = await loadSettings();
   const { usage, status, apiKey } = await chrome.storage.local.get(['usage', 'status', 'apiKey']);
 
   $('enabled').checked = settings.enabled;
   $('displayMode').value = settings.displayMode;
+  $('muteMode').value = settings.muteMode;
 
   const list = $('categories');
   list.replaceChildren();
@@ -22,7 +22,7 @@ async function load() {
     const dot = document.createElement('span');
     dot.className = 'dot';
     dot.style.background = cat.color;
-    label.append(box, dot, cat.name);
+    label.append(box, dot, cat.kind === 'mute' ? `🔇 ${cat.name}` : cat.name);
     list.append(label);
   });
 
@@ -37,14 +37,21 @@ async function load() {
 }
 
 async function save(mutate) {
-  const { settings: stored } = await chrome.storage.sync.get('settings');
-  const settings = structuredClone({ ...DEFAULT_SETTINGS, ...(stored || {}) });
+  const settings = structuredClone(await loadSettings());
   mutate(settings);
-  await chrome.storage.sync.set({ settings });
+  await saveSettings(settings);
 }
 
 $('enabled').addEventListener('change', (e) => save((s) => (s.enabled = e.target.checked)));
 $('displayMode').addEventListener('change', (e) => save((s) => (s.displayMode = e.target.value)));
+$('muteMode').addEventListener('change', (e) => save((s) => (s.muteMode = e.target.value)));
+// sidePanel.open はクリック直後に呼ぶ必要があるので、ウィンドウ ID は先に取っておく。
+let windowId = null;
+chrome.windows.getCurrent().then((w) => (windowId = w.id));
+$('openPanel').addEventListener('click', () => {
+  if (windowId == null) return;
+  chrome.sidePanel.open({ windowId }).then(() => window.close());
+});
 $('openOptions').addEventListener('click', () => chrome.runtime.openOptionsPage());
 
 load();

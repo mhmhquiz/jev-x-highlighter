@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>見逃しリスト</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="panel">
+  <header class="panel-head">
+    <h1>見逃しリスト <span id="count" class="muted"></span></h1>
+    <input type="search" id="query" placeholder="本文・投稿者で絞り込み">
+    <div id="filters" class="filters"></div>
+    <div class="row">
+      <label class="row"><input type="checkbox" id="usefulOnly"> 💡 有益のみ</label>
+      <label class="row"><input type="checkbox" id="unreadOnly"> 未読のみ</label>
+      <button id="clear" class="small">全部消す</button>
+    </div>
+  </header>
+  <ul id="list" class="hits"></ul>
+  <p id="empty" class="muted" hidden>まだありません。X のタイムラインで強調されたツイートがここに溜まります。</p>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

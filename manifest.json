@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Jev X Highlighter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "X のタイムラインで、興味のある話題のツイートを Jev (TypeSafe AI) で判定して強調表示します。",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "sidePanel"
+  ],
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",
@@ -15,15 +18,28 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["src/x-parser.js", "src/inject.js"],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "src/x-parser.js",
+        "src/inject.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["src/content.js"],
-      "css": ["src/content.css"],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
       "run_at": "document_start"
     }
   ],
@@ -31,5 +47,9 @@
     "default_popup": "src/popup.html",
     "default_title": "Jev X Highlighter"
   },
-  "options_page": "src/options.html"
+  "options_page": "src/options.html",
+  "side_panel": {
+    "default_path": "src/sidepanel.html"
+  },
+  "minimum_chrome_version": "116"
 }

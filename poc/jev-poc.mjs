@@ -1,6 +1,6 @@
 // Jev の日本語ツイート判定の精度と速度を測る PoC。
 //   TYPESAFE_API_KEY を環境変数に入れて実行する:  npm run poc [-- samples.json]
-// samples.json の形式: [{ "text": "...", "author": "(任意)", "label": "ai" | "vrc" | "other" }]
+// samples.json の形式: [{ "text": "...", "author": "(任意)", "label": "ai" | "vrc" | "valorant" | "other" }]
 import { readFileSync } from 'node:fs';
 import { buildBatchRequest, buildRequest, callJev, extractScores } from '../src/jev.js';
 import { DEFAULT_SETTINGS } from '../src/defaults.js';
@@ -13,7 +13,7 @@ if (!apiKey) {
 
 const file = process.argv[2] || new URL('./samples.example.json', import.meta.url);
 const samples = JSON.parse(readFileSync(file, 'utf8')).map((s, i) => ({ id: String(i), ...s }));
-const cats = DEFAULT_SETTINGS.categories;
+const cats = DEFAULT_SETTINGS.categories.filter((c) => c.enabled && c.kind !== 'mute');
 const THRESHOLD = DEFAULT_SETTINGS.threshold;
 const CONCURRENCY = 8;
 

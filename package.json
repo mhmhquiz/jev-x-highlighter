@@ -1,6 +1,6 @@
 {
   "name": "jev-x-highlighter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "X の興味あるツイートを Jev (TypeSafe AI) で判定して強調表示する Chrome 拡張",
